@@ -1,16 +1,18 @@
-import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import React from 'react';
 import TcpSocket from 'react-native-tcp-socket';
 
 const options = {
   port: 7070,
   host: '10.0.2.2',
 };
-export default function App() {
+
+export default function TcpSocketConnection(onConnected) {
   const client = TcpSocket.createConnection(options, () => {
     // Write on the socket
-    console.log('eeeeeeeee');
-    client.write('Hello server!');
+    console.log('Connected to server');
+    // client.write('Hello server!');
+    onConnected?.('Connected to server');
 
     // Close socket
     // client.destroy();
@@ -28,17 +30,13 @@ export default function App() {
     console.log('Connection closed!');
   });
 
-  const onSendMessage = () => {
-    client.write('Hello! This is message from client!');
+  const onSendMessage = (message) => {
+    client.write(message);
   };
 
+  const onCloseSocket = () => {
+    client.destroy();
+  };
 
-  return (
-    <View>
-      <Text>Demo of TCP connection</Text>
-      <TouchableOpacity onPress={onSendMessage}>
-        <Text>Send Message</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  return { onSendMessage, onCloseSocket };
 }
